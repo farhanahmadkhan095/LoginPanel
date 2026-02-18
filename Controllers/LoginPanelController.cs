@@ -369,6 +369,7 @@ namespace LoginPanel.Controllers
                 cmd.Parameters.AddWithValue("@EntryBy", HttpContext.Session.GetInt32("UserId"));
 
                 con.Open();
+
                 var dr = cmd.ExecuteReader();
                 while (dr.Read())
                 {
