@@ -1,0 +1,145 @@
+﻿@model IEnumerable<LoginPanel.Models.InventoryAdjustmentReasonDto>
+
+@{
+    ViewData["Title"] = "Inventory Adjustment Reasons";
+}
+
+<div class="container mt-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="fw-bold">⚙️ Inventory Adjustment Reasons</h3>
+
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add Reason
+        </a>
+    </div>
+
+    <!-- Card -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle table-bordered">
+                    <thead class="table-dark text-center">
+                        <tr>
+                            <th>#</th>
+                            <th>Reason</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Modified</th>
+                            <th style="width:180px">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="text-center fw-bold">@item.Id</td>
+
+                                <td class="fw-semibold">@item.Reason</td>
+
+                                <!-- 🔹 READABLE TYPE -->
+                                <td class="text-center">
+                                    @if (item.IsPositive)
+                                    {
+                                        <span class="badge bg-success">
+                                            Purchase / Receive (+)
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">
+                                            Sale / Damage (-)
+                                        </span>
+                                    }
+                                </td>
+
+                                <!-- Status -->
+                                <td class="text-center">
+                                    <span class="badge @(item.IsActive ? "bg-success" : "bg-secondary")">
+                                        @(item.IsActive ? "Active" : "Inactive")
+                                    </span>
+                                </td>
+
+                                <td class="text-center">
+                                    @item.CreatedDate.ToString("dd-MM-yyyy")
+                                </td>
+
+                                <td class="text-center">
+                                    @(item.ModifiedDate?.ToString("dd-MM-yyyy") ?? "-")
+                                </td>
+
+                                <!-- Actions -->
+                                <td class="text-center">
+                                    <a asp-action="Edit"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-sm btn-warning me-1">
+                                        Edit
+                                    </a>
+
+                                    <button type="button"
+                                            class="btn btn-sm @(item.IsActive ? "btn-danger" : "btn-success") toggle-btn"
+                                            data-id="@item.Id"
+                                            data-active="@item.IsActive">
+                                        @(item.IsActive ? "Deactivate" : "Activate")
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).on('click', '.toggle-btn', function () {
+
+            var btn = $(this);
+            var id = btn.data('id');
+            var isActive = btn.data('active');
+
+            Swal.fire({
+                title: isActive ? 'Deactivate this reason?' : 'Activate this reason?',
+                text: isActive
+                    ? 'You can activate it again anytime.'
+                    : 'This reason will be available for adjustments.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("ToggleActive", "InventoryAdjustmentReason")',
+                        type: 'POST',
+                        data: { id: id, isActive: !isActive },
+                        success: function () {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Updated!',
+                                timer: 1200,
+                                showConfirmButton: false
+                            });
+
+                            setTimeout(() => location.reload(), 1200);
+                        },
+                        error: function () {
+                            Swal.fire('Error', 'Something went wrong', 'error');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

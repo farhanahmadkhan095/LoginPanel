@@ -1,0 +1,140 @@
+﻿@model LoginPanel.Models.OrderDetailsVM
+@{
+    ViewBag.Title = "Order Details";
+    Layout = "~/Views/Shared/ShopLayout.cshtml";
+}
+
+@* @functions {
+    string ImgByProduct(string name)
+    {
+        var n = (name ?? "").ToLower();
+
+        if (n.Contains("iphone")) return "/images/iphone15.jpg";
+        if (n.Contains("pixel")) return "/images/GooglePixel8.png";
+        if (n.Contains("macbook")) return "/images/AppleMacBook.png";
+        if (n.Contains("acer")) return "/images/Acer.png";
+        if (n.Contains("hp")) return "/images/HPPAVILION1.png";
+        if (n.Contains("dell")) return "/images/delllaptop04.png";
+        if (n.Contains("lenovo") || n.Contains("thinkpad")) return "/images/LenovoThinkPad.png";
+        if (n.Contains("samsung")) return "/images/samsung24.png";
+        if (n.Contains("redmi")) return "/images/Redminote.jpg";
+        if (n.Contains("oneplus")) return "/images/Oneplus.jpg";
+        if (n.Contains("realme")) return "/images/Realme1.png";
+
+        return "/images/no-image.png";
+    }
+}
+ *@
+
+<!-- HEADER -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Order #@Model.OrderId</h3>
+    <a class="btn btn-outline-secondary" href="/Shop/Orders">Back</a>
+</div>
+
+<!-- ORDER INFO -->
+<div class="card shadow-sm mb-3">
+    <div class="card-body row">
+        <div class="col-md-4"><b>Date:</b> @Model.OrderDate</div>
+        <div class="col-md-4">
+            <b>Status:</b>
+            <span class="badge bg-info">@Model.Status</span>
+        </div>
+        <div class="col-md-4 text-end"><b>Total:</b> ₹@Model.TotalAmount</div>
+    </div>
+</div>
+
+<!-- ORDER TIMELINE --> 
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <h6>Order Timeline</h6>
+        <ul class="list-group list-group-flush">
+
+            <li class="list-group-item @(Model.Status != "PaymentPending" ? "text-success fw-bold" : "")">
+                ✔ Payment Successful
+            </li>
+
+            <li class="list-group-item @(Model.Status == "Placed" || Model.Status == "Confirmed" || Model.Status == "Shipped" || Model.Status == "Delivered" ? "text-success fw-bold" : "")">
+                ✔ Order Placed
+            </li>
+
+            <li class="list-group-item @(Model.Status == "Confirmed" || Model.Status == "Shipped" || Model.Status == "Delivered" ? "text-success fw-bold" : "")">
+                ✔ Order Confirmed
+            </li>
+
+            <li class="list-group-item @(Model.Status == "Shipped" || Model.Status == "Delivered" ? "text-success fw-bold" : "")">
+                🚚 Shipped
+            </li>
+
+            <li class="list-group-item @(Model.Status == "Delivered" ? "text-success fw-bold" : "")">
+                📦 Delivered
+            </li>
+
+            @if (Model.Status == "Cancelled")
+            {
+                <li class="list-group-item text-danger fw-bold">
+                    ❌ Order Cancelled
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+
+<!-- CANCEL BUTTON -->
+@if (Model.Status == "Placed" || Model.Status == "Confirmed")
+{
+    <div class="card shadow-sm mb-3">
+        <div class="card-body text-end">
+            <form method="post" asp-action="CancelOrder">
+                <input type="hidden" name="orderId" value="@Model.OrderId" />
+                <button class="btn btn-danger">Cancel Order</button>
+            </form>
+        </div>
+    </div>
+}
+
+<!-- REFUND INFO -->
+@if (Model.Status == "Cancelled")
+{
+    <div class="card border-danger shadow-sm mb-3">
+        <div class="card-body">
+            <h6 class="text-danger">Refund Details</h6>
+            <p>Amount: <b>₹@Model.TotalAmount</b></p>
+            <p>Status: <b>@Model.RefundStatus</b> (3–5 working days)</p>
+        </div>
+    </div>
+}
+
+<!-- PRODUCTS -->
+<div class="card shadow-sm">
+    <table class="table align-middle mb-0">
+        <thead class="table-light">
+            <tr>
+                <th>Product</th>
+                <th class="text-end">Qty</th>
+                <th class="text-end">Price</th>
+                <th class="text-end">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var it in Model.Items)
+            {
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <img src="@it.ImageUrl"
+                                 style="width:60px;height:60px;object-fit:cover"
+                                 class="rounded border" />
+
+                            <span class="fw-semibold">@it.ProductName</span>
+                        </div>
+                    </td>
+
+                    <td class="text-end">@it.Qty</td>
+                    <td class="text-end">₹@it.Price</td>
+                    <td class="text-end fw-bold">₹@it.LineTotal</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,86 @@
+﻿@model LoginPanel.Models.CheckoutAddressVM
+
+@{
+    ViewBag.Title = "My Account";
+    Layout = "~/Views/Shared/ShopLayout.cshtml";
+}
+
+<div class="row g-4">
+
+    <!-- LEFT : USER CARD -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm text-center h-100">
+            <div class="card-body">
+                <i class="bi bi-person-circle fs-1 text-primary"></i>
+
+                <h5 class="mt-2 mb-0">@ViewBag.UserName</h5>
+                <div class="text-muted small">@ViewBag.RoleName</div>
+
+                <hr />
+
+                <div class="small text-muted">
+                    Manage your personal info & delivery address
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT : ADDRESS -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm h-100">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span class="fw-semibold">
+                    <i class="bi bi-geo-alt me-1"></i>
+                    Saved Delivery Address
+                </span>
+
+                <a href="/Shop/CheckoutAddress"
+                   class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-pencil-square"></i>
+                    Add / Change
+                </a>
+            </div>
+
+            <div class="card-body">
+
+                @if (Model == null)
+                {
+                    <div class="alert alert-warning mb-0">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        No address saved yet.
+                    </div>
+                }
+                else
+                {
+                    <div class="border rounded p-3">
+
+                        <div class="fw-semibold fs-6">
+                            <i class="bi bi-person"></i>
+                            @Model.FullName
+                        </div>
+
+                        <div class="mt-2">
+                            <i class="bi bi-house-door"></i>
+                            @Model.AddressLine
+                        </div>
+
+                        <div>
+                            <i class="bi bi-building"></i>
+                            @Model.City -
+                            <b>@Model.Pincode</b>
+                        </div>
+
+                        <div class="text-muted small mt-2">
+                            <i class="bi bi-telephone"></i>
+                            @Model.Mobile
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+
+</div>

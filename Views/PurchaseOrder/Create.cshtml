@@ -1,0 +1,186 @@
+﻿@model LoginPanel.Models.PurchaseOrderViewModel
+
+<h3 class="mb-3 text-primary fw-bold">🛒 Create Purchase Order</h3>
+<p class="text-muted mb-4">Select vendor → enter quantity → submit Purchase Order</p>
+
+<form asp-action="Create" method="post" id="poForm">
+    @Html.AntiForgeryToken()
+    <input type="hidden" id="TotalAmount" name="TotalAmount" value="0" />
+
+    <!-- 🔹 Vendor Section (TOP ONLY) -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <label class="form-label fw-semibold">Select Vendor</label>
+            <select id="VendorId" name="SelectedVendorId" class="form-select" required>
+                <option value="">-- Select Vendor --</option>
+                @foreach (var v in Model.Vendors)
+                {
+                    <option value="@v.VendorId">@v.VendorName</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <!-- 🔹 Products Section (BELOW – hidden initially) -->
+    <div id="productSection" class="card shadow-sm d-none">
+        @* <div class="card-header bg-dark text-white">
+            Products
+        </div> *@
+        <div class="card-body p-0">
+            <table class="table table-bordered text-center mb-0 table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="text-start">Product</th>
+                        <th>Qty</th>
+                        <th>Rate</th>
+                        <th>Amount</th>
+                        <th>✕</th>
+                    </tr>
+                </thead>
+                <tbody id="productBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 🔹 Summary Section -->
+    <div id="summarySection" class="row mt-3 d-none">
+        <div class="col-md-4 offset-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <span>Sub Total</span>
+                        <span id="subTotal">₹ 0.00</span>
+                    </div>
+                    <hr />
+                    <div class="d-flex justify-content-between fw-bold">
+                        <span>Grand Total</span>
+                        <span id="grandTotal">₹ 0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔹 Submit -->
+    <div class="text-end mt-4">
+        <button type="submit" class="btn btn-success btn-lg">
+            Submit Purchase Order
+        </button>
+    </div>
+</form>
+
+@section Scripts {
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    @if (TempData["Success"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: '@TempData["Success"]',
+                timer: 2500,
+                showConfirmButton: false
+            });
+        </script>
+    }
+    <script>
+        $(document).ready(function () {
+
+            $("#VendorId").change(function () {
+
+                let vendorId = $(this).val();
+                if (!vendorId) {
+                    hideAll();
+                    return;
+                }
+
+                $.get("/PurchaseOrder/GetVendorProducts", { vendorId }, function (data) {
+
+                    if (!data || data.length === 0) {
+                        hideAll();
+                        return;
+                    }
+
+                    let rows = "";
+
+                    data.forEach((p, index) => {
+                        rows += `
+                        <tr>
+                            <td class="text-start">
+                                ${p.productName}
+                                <input type="hidden" name="Items[${index}].ProductId" value="${p.productId}" />
+                            </td>
+                            <td>
+                                <input type="number" name="Items[${index}].Quantity"
+                                       value="0" min="1" class="form-control qty" />
+                            </td>
+                            <td>
+                                <input type="number" name="Items[${index}].Price"
+                                       value="${p.price}" readonly class="form-control price" />
+                            </td>
+                            <td class="amount">₹ 0.00</td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm remove">✕</button>
+                            </td>
+                        </tr>`;
+                    });
+
+                    $("#productBody").html(rows);
+                    showAll();
+                    calculate();
+                });
+            });
+
+            $(document).on("input", ".qty", calculate);
+
+            $(document).on("click", ".remove", function () {
+                $(this).closest("tr").remove();
+                reindexRows();
+                calculate();
+
+                if ($("#productBody tr").length === 0)
+                    hideAll();
+            });
+
+            function calculate() {
+                let total = 0;
+
+                $("#productBody tr").each(function () {
+                    let qty = Number($(this).find(".qty").val());
+                    let price = Number($(this).find(".price").val());
+
+                    let amt = qty * price;
+                    $(this).find(".amount").text("₹ " + amt.toFixed(2));
+
+                    total += amt;
+                });
+
+                $("#subTotal").text("₹ " + total.toFixed(2));
+                $("#grandTotal").text("₹ " + total.toFixed(2));
+                $("#TotalAmount").val(total);
+            }
+
+            function reindexRows() {
+                $("#productBody tr").each(function (i) {
+                    $(this).find("input").each(function () {
+                        let prop = $(this).attr("name").split(".")[1];
+                        $(this).attr("name", `Items[${i}].${prop}`);
+                    });
+                });
+            }
+
+            function hideAll() {
+                $("#productSection, #summarySection").addClass("d-none");
+                $("#productBody").html("");
+                $("#TotalAmount").val(0);
+            }
+
+            function showAll() {
+                $("#productSection, #summarySection").removeClass("d-none");
+            }
+        });
+    </script>
+
+}

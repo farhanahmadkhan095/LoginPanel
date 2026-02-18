@@ -1,0 +1,129 @@
+﻿@model LoginPanel.Models.InventoryAdjustmentDto
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Inventory Adjustment";
+}
+
+<div class="container-fluid mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">📦 Inventory Adjustment</h5>
+        </div>
+
+        <div class="card-body">
+
+            <form id="productSelectForm" method="get" asp-action="Adjustment">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Select Product</label>
+                        <select name="productId"
+                                class="form-select"
+                                asp-for="ProductId"
+                                asp-items="ViewBag.Products"
+                                onchange="this.form.submit()">
+                            <option value="">-- Select Product --</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+
+            @if (Model != null && Model.ProductId > 0)
+            {
+                <hr />
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Product</label>
+                        <input type="text" class="form-control" value="@Model.ProductName" readonly />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Current Quantity</label>
+                        <input type="number" id="currentQty" class="form-control text-center fw-bold" value="@Model.CurrentQty" readonly />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Unit Cost (₹)</label>
+                        <input type="text" class="form-control text-end" value="@Model.UnitCost.ToString("N2")" readonly />
+                    </div>
+                </div>
+
+                <form id="adjustmentForm">
+                    <input type="hidden" id="productId" name="productId" value="@Model.ProductId" />
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Quantity</label>
+                            <input type="number" name="qtyChange" id="qtyChange" class="form-control" min="1" step="1" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Reason</label>
+                            <select name="reasonId" id="reasonId" class="form-select" asp-items="ViewBag.Reasons" required>
+                                <option value="">-- Select Reason --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-success w-100">Adjust Inventory</button>
+                        </div>
+                    </div>
+                </form>
+
+                <hr />
+                <h6 class="fw-bold">🕒 Recent Adjustments</h6>
+                <div id="historyContainer">
+                    <div class="text-muted">Loading history...</div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info mb-0">Please select a product to adjust inventory.</div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function loadHistory() {
+            const productId = $('#productId').val();
+            if (!productId || productId == 0) return;
+
+            $.get('@Url.Action("GetRecentAdjustments", "Inventory")', { productId }, function(html) {
+                $('#historyContainer').html(html);
+            });
+        }
+
+        function refreshQty() {
+            const productId = $('#productId').val();
+            if (!productId || productId == 0) return;
+
+            $.get('@Url.Action("GetCurrentQty", "Inventory")', { productId }, function(qty) {
+                $('#currentQty').val(qty);
+            });
+        }
+
+        $(document).ready(function() {
+            loadHistory();
+
+            $('#adjustmentForm').submit(function(e) {
+                e.preventDefault();
+
+                let qty = parseInt($('#qtyChange').val());
+                let reason = $('#reasonId').val();
+                if (!qty || qty <= 0) { Swal.fire('Invalid Quantity','Quantity must be > 0','warning'); return; }
+                if (!reason) { Swal.fire('Reason Required','Please select a reason','warning'); return; }
+
+                $.ajax({
+                    type:'POST',
+                    url:'@Url.Action("AdjustmentSave", "Inventory")',
+                    data: $(this).serialize(),
+                    success: function() {
+                        Swal.fire({icon:'success',title:'Inventory Updated',timer:1200,showConfirmButton:false});
+                        $('#qtyChange').val('');
+                        refreshQty();
+                        loadHistory();
+                    },
+                    error: function() { Swal.fire('Error','Something went wrong','error'); }
+                });
+            });
+        });
+    </script>
+}

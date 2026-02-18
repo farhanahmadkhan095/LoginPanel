@@ -1,0 +1,328 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    Layout = "_Layout";
+}
+<style>
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
+
+    .switch input {
+        display: none;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        background-color: #ccc;
+        border-radius: 34px;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        transition: .4s;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        border-radius: 50%;
+        transition: .4s;
+    }
+
+    input:checked + .slider {
+        background-color: #4CAF50;
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+
+    .editable {
+        border: none;
+        background: transparent;
+        outline: none;
+        display: inline-block;
+        width: auto;
+        min-width: 1px;
+        padding: 0;
+        font-size: 14px;
+        box-sizing: content-box !important;
+        text-decoration: underline;
+    }
+
+    .editable:focus {
+        text-decoration: none;
+    }
+
+    #productTable td {
+        padding: 4px 6px !important;
+    }
+
+    #productTable td input.editable {
+        width: auto !important;
+    }
+
+    #productModal input,
+    #productModal textarea,
+    #productModal select {
+        border: 1px solid #ced4da !important;
+        background: white !important;
+        padding: 6px !important;
+    }
+
+    .top-action-row {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        margin-top: 15px;
+    }
+
+    .right-buttons {
+        display: flex;
+        gap: 10px;
+    }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold">📦 Product Management</h4>
+    <span class="text-muted">
+        Welcome, @Context.Session.GetString("UserName") 👑
+    </span>
+</div>
+
+
+<div class="top-action-row">
+    <button class="btn btn-primary shadow-sm" onclick="OpenCreateForm()">
+        <i class="bi bi-plus-circle"></i> Create New Product
+    </button>
+
+
+
+    <div class="right-buttons d-flex" style="gap:10px;">
+        <form enctype="multipart/form-data" method="post" asp-action="UploadExcel" class="m-0 p-0">
+            <input type="file" name="excelFile" id="excelInput" style="display:none;" onchange="this.form.submit()" />
+            <button type="button" class="btn btn-success" onclick="document.getElementById('excelInput').click()">Upload Excel</button>
+        </form>
+
+        <a href="/LoginPanel/DownloadTemplate" class="btn btn-info">Download Template</a>
+    </div>
+</div>
+
+@* <a href="/LoginPanel/Logout" class="btn btn-danger" style="position:absolute; top:10px; right:10px;">Logout</a> *@
+
+<table id="productTable" class="table table-bordered text-center">
+    <thead>
+        <tr>
+            <th>Sr.No</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>Active</th>
+            <th>Created Date</th>
+            <th>Modified Date</th>
+            <th>Entry By</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody id="productbody"></tbody>
+</table>
+
+<div id="pagination" class="d-flex justify-content-center mt-3" style="gap:5px;"></div>
+
+<div class="modal fade" id="productModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Product Form</h5>
+                <button class="close" data-dismiss="modal" id="closemodal">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" id="ProductId" value="0" />
+
+                <label>Name</label>
+                <input type="text" id="ProductName" class="form-control" />
+
+                <label>Price</label>
+                <input type="number" id="ProductPrice" class="form-control" />
+
+                <label>Description</label>
+                <input type="text" id="ProductDescription" class="form-control" />
+
+                <label class="switch mt-1">
+                    <input type="checkbox" id="IsActive">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-success" onclick="SaveProduct()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+        getProductList();
+
+        $("#closemodal").click(() => {
+            $("#productModal").modal("hide");
+        });
+    });
+
+  function UpdateProductPrice(_this, _productId) {
+      debugger
+    var $tr = $(_this).closest(".trMain");
+    var productPrice = $tr.find(".price-edit").val();
+
+    var obj = {
+        ProductId: _productId,
+        ProductPrice: productPrice
+    };
+
+    $.ajax({
+        url: "/LoginPanel/UpdateProductPrice",
+        type: "POST",
+        data: obj,
+        success: function (res) {
+            $tr.find("#tdModifiedDate").text(res.modifiedDate);
+            alert(res.message);
+        }
+    });
+}
+
+function UpdateDesc(_this, _productId) {
+    debugger;
+
+    var $tr = $(_this).closest(".trMain");
+    var prodDesc = $tr.find(".desc-edit").val();
+
+    var obj = {
+        ProductId: _productId,
+        ProductDescription: prodDesc   
+    };
+
+    $.ajax({
+        url: "/LoginPanel/UpdateDescription", 
+        type: "POST",
+        data: obj,
+       success: function (res) {
+            $tr.find("#tdModifiedDate").text(res.modifiedDate);
+            alert(res.message);
+        }
+    });
+}
+
+
+    function OpenCreateForm() {
+        $("#ProductId").val(0);
+        $("#ProductName").val("");
+        $("#ProductPrice").val("");
+        $("#ProductDescription").val("");
+        $("#IsActive").prop("checked", true);
+        $("#productModal").modal("show");
+    }
+
+    function getProductList() {
+        $.ajax({
+            url: "/LoginPanel/PrtGetProductList",
+            type: "GET",
+            success: function (response) {
+                $("#productTable #productbody").empty().html(response);
+            }
+        });
+    }
+
+    function SaveProduct() {
+        let obj = {
+            ProductId: $("#ProductId").val(),
+            ProductName: $("#ProductName").val(),
+            ProductPrice: $("#ProductPrice").val(),
+            ProductDescription: $("#ProductDescription").val(),
+            IsActive: $("#IsActive").prop("checked")
+        };
+
+        $.ajax({
+            url: "/LoginPanel/AddOrUpdateProduct",
+            type: "POST",
+            data: obj,
+            success: function () {
+                Swal.fire("Saved!", "Product Saved Successfully!", "success");
+                $("#productModal").modal("hide");
+                getProductList();
+            },
+            error: function () {
+                Swal.fire("Error", "Error while saving", "error");
+            }
+        });
+    }
+
+    function EditProduct(id) {
+        $.ajax({
+            url: "/LoginPanel/GetProductById?id=" + id,
+            type: "GET",
+            success: function (data) {
+                $("#ProductId").val(data.productId);
+                $("#ProductName").val(data.productName);
+                $("#ProductPrice").val(data.productPrice);
+                $("#ProductDescription").val(data.productDescription);
+                $("#IsActive").prop("checked", data.isActive);
+
+                $("#productModal").modal("show");
+            }
+        });
+    }
+
+ 
+    function DeleteProduct(id) {
+        if (!confirm("Are you sure you want to delete?")) return;
+
+        $.ajax({
+            url: "/LoginPanel/DeleteProduct?id=" + id,
+            type: "POST",
+            success: function (res) {
+                alert(res.message);
+                if (res.status == 1) {
+                    getProductList();
+                }
+            }
+        });
+    }
+
+    function updateStatus(_this , _productId){
+          var $tr = $(_this).closest(".trMain");
+       var status =  $(_this).is(":checked");
+       var obj = {
+           ProductId : _productId,
+               IsActive : status
+           }
+            $.ajax({
+                url: "/LoginPanel/UpdateStatus",
+            type: "POST",
+            data: obj,
+            success: function (response) {
+                alert(response.message);
+                $tr.find("#tdModifiedDate").text(response.modifiedDate);
+            }
+        });
+
+    }
+
+</script>

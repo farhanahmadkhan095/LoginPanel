@@ -1,0 +1,31 @@
+﻿@model LoginPanel.Models.VendorModel
+@{
+    string selected = Model.IsActive == true ? "checked" : "";
+    string btnName = Model.VendorId > 0? "Update" : "Save";
+ }
+
+<form>
+    <input type="hidden" id="VendorId" value="@Model.VendorId" />
+
+    <label>Name</label>
+    <input type="text" id="VendorName" class="form-control" value="@Model.VendorName" />
+
+    <label>Contact Number</label>
+    <input type="text" id="VendorContactNumber" class="form-control" value="@Model.ContactNumber"  />
+
+    <label>Email</label>
+    <input type="text" id="VendorEmail" class="form-control" value="@Model.Email" />
+
+
+
+    <label>Vendor Address</label>
+    <input type="text" id="VendorAddress" class="form-control" value="@Model.Address" />
+
+    <label class="switch mt-1">
+        <input type="checkbox" id="IsActive" value="@Model.IsActive" @selected>
+        <span class="slider"></span>
+    </label>
+    <div class="modal-footer">
+        <button class="btn btn-success" onclick="SaveVendor()">@btnName</button>
+    </div>
+</form>

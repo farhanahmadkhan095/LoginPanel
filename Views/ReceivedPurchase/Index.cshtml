@@ -1,0 +1,113 @@
+﻿@model List<PurchaseOrderViewModel>
+
+<h2 class="mb-3">Purchase Orders</h2>
+
+<ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#pending">
+            Pending
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#received">
+            Received
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content mt-3">
+
+    <!-- Pending -->
+    <div class="tab-pane fade show active" id="pending">
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>PO Id</th>
+                    <th>Order Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var po in Model.Where(x => x.OrderStatus == 0))
+                {
+                    <tr>
+                        <td>@po.PurchaseOrderId</td>
+                        <td>@po.OrderDate.ToShortDateString()</td>
+                        <td>
+                            <a href="/ReceivedPurchase/Receive/@po.PurchaseOrderId"
+                               class="btn btn-sm btn-primary">
+                                Receive
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Received -->
+    <div class="tab-pane fade" id="received">
+        <table class="table table-bordered table-striped">
+            <thead class="table-success">
+                <tr>
+                    <th>PO Id</th>
+                    <th>Order Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var po in Model.Where(x => x.OrderStatus == 1))
+                {
+                    <tr>
+                        <td>@po.PurchaseOrderId</td>
+                        <td>@po.OrderDate.ToShortDateString()</td>
+                        <td>
+                            <span class="badge bg-success received-badge"
+                                  data-poid="@po.PurchaseOrderId"
+                                  style="cursor:pointer">
+                                Received
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- 🔹 Modal for Received Details -->
+<div class="modal fade" id="receivedModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" id="modalContent">
+            <!-- AJAX se details load honge -->
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        //  Show SweetAlert if TempData has SuccessMessage
+        @if (TempData["SuccessMessage"] != null)
+        {
+                <text>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: '@TempData["SuccessMessage"]',
+                    timer: 2500,
+                    showConfirmButton: false
+                });
+                </text>
+        }
+
+        // 🔹 Click on received badge to show modal with details
+        $(".received-badge").click(function(){
+            var poId = $(this).data("poid");
+            $("#modalContent").load(`/ReceivedPurchase/Details/${poId}`);
+            $("#receivedModal").modal("show");
+        });
+    </script>
+}

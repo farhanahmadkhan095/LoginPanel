@@ -1,0 +1,201 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div style="width:380px; margin:auto; padding:20px; border:1px solid #ccc; border-radius:10px;">
+     @if (TempData["Success"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: '@TempData["Success"]'
+            });
+        </script>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: '@TempData["Error"]'
+            });
+        </script>
+    }
+
+    <form asp-action="RegistrationUser" method="post">
+        <h2 style="text-align:center; margin-top:20px;color:dodgerblue">User Registration</h2>
+
+        <label>User Name</label>
+        <input type="text" name="UserName" class="form-control" style="margin-bottom:10px;" placeholder="Enter Name"required />
+
+
+        <label>Password</label>
+        <input type="password" name="Password" class="form-control" style="margin-bottom:10px;" placeholder="Enter Your Password"required/>
+
+        <label>Confirm Password</label>
+        <input type="password" name="ConfirmPassword" class="form-control" style="margin-bottom:10px;" placeholder="Confirm Your Password"required />
+
+        <label>Email</label>
+        <input type="email" name="Email" class="form-control" style="margin-bottom:10px;" placeholder="Enter Email"required />
+
+        <label>Mobile No</label>
+        <input type="text" name="MobileNo" class="form-control" style="margin-bottom:10px;" placeholder="Enter Mobile No."required />
+
+        <label>Country</label>
+        <select name="CountryId" id="CountryId" class="form-control" style="margin-bottom:10px;"required>
+            <option value="">-- Select Country --</option>
+        </select>
+
+        <label>State</label>
+        <select name="StateId" id="StateId" class="form-control" style="margin-bottom:10px;"required>
+            <option value="">-- Select State --</option>
+        </select>
+
+        <label>City</label>
+        <select name="CityId" id="CityId" class="form-control" style="margin-bottom:10px;"required>
+            <option value="">-- Select City --</option>
+        </select>
+
+        <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;">
+            Register
+        </button>
+    </form>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<script>
+
+$(document).ready(function () {
+
+    // -------------------- Load Country ---------------------
+    $.ajax({
+        url: '/LoginPanel/GetCountryList',
+        type: 'GET',
+        success: function (data) {
+            $.each(data, function (i, item) {
+                $("#CountryId").append(`<option value="${item.countryId}">${item.countryName}</option>`);
+            });
+        }
+    });
+
+    // -------------------- Load State ---------------------
+        // Load State
+    $("#CountryId").change(function () {
+
+        let cid = $(this).val();
+
+        // reset state
+        $("#StateId").html('<option value="">-- Select State --</option>');
+
+        // reset city
+        $("#CityId").html('<option value="">-- Select City --</option>');
+
+        if (cid == "" || cid == 0) {
+            return; // agar country select nahi, toh state/city disable
+        }
+
+        $.ajax({
+            url: '/LoginPanel/GetStateList?countryId=' + cid,
+            type: 'GET',
+            success: function (data) {
+                $.each(data, function (i, item) {
+                    $("#StateId").append(`<option value="${item.stateId}">${item.stateName}</option>`);
+                });
+            }
+        });
+    });
+
+
+    // -------------------- Load City ---------------------
+    $("#StateId").change(function () {
+        debugger
+        let sid = $(this).val();
+        $("#CityId").html('<option>-- Select City --</option>');
+
+        $.ajax({
+            url: '/LoginPanel/GetCityList?stateId=' + sid,
+            type: 'GET',
+            success: function (data) {
+                $.each(data, function (i, item) {
+                    $("#CityId").append(`<option value="${item.cityId}">${item.cityName}</option>`);
+                });
+            }
+        });
+    });
+
+});
+
+</script>
+<script>
+    $(document).ready(function () {
+
+        // Form Submit Validation
+        $("form").submit(function () {
+
+            let userName = $("input[name='UserName']").val().trim();
+            let mobile = $("input[name='MobileNo']").val().trim();
+            let password = $("input[name='Password']").val().trim();
+            let confirmPassword = $("input[name='ConfirmPassword']").val().trim();
+            let country = $("#CountryId").val();
+            let state = $("#StateId").val();
+            let city = $("#CityId").val();
+
+            // 1. UserName required
+            if (userName === "") {
+                alert("User Name is required!");
+                return false; // form submit stop
+            }
+
+            // 2. Mobile should be 10 digits
+            if (mobile.length !== 10 || isNaN(mobile)) {
+                alert("Mobile number must be exactly 10 digits!");
+                return false;
+            }
+
+            // 3. Password required
+            if (password === "") {
+                alert("Password is required!");
+                return false;
+            }
+
+            // 4. Confirm Password match
+            if (password !== confirmPassword) {
+                alert("Password and Confirm Password must match!");
+                return false;
+            }
+
+            // 5. Country required
+            if (country === "") {
+                alert("Please select a Country!");
+                return false;
+            }
+
+            // 6. State required
+            if (state === "") {
+                alert("Please select a State!");
+                return false;
+            }
+
+            // 7. City required
+            if (city === "") {
+                alert("Please select a City!");
+                return false;
+            }
+
+            return true; // VALID → form submit
+        });
+
+    });
+</script>
+
+
+    

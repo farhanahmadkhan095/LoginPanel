@@ -1,0 +1,94 @@
+﻿@model LoginPanel.Models.ProductModel
+@{
+    ViewBag.Title = "Checkout";
+    Layout = "~/Views/Shared/ShopLayout.cshtml";
+    int stock = (ViewBag.Stock == null) ? 0 : Convert.ToInt32(ViewBag.Stock);
+}
+
+@functions {
+    string ImgByProduct(string name)
+    {
+        var n = (name ?? "").Trim().ToLower();
+
+        if (n.Contains("iphone") && n.Contains("15")) return "/images/iphone15.jpg";
+        if (n.Contains("macbook") && n.Contains("air")) return "/images/macbookair.jpg";
+        if (n.Contains("thinkpad") || n.Contains("lenovo")) return "/images/laptop02.jpg";
+        if (n.Contains("hp pavilion") || (n.Contains("hp") && n.Contains("pavilion"))) return "/images/laptop01.jpg";
+        if (n.Contains("dell xps") || (n.Contains("dell") && n.Contains("xps"))) return "/images/laptop04.jpg";
+        if (n.Contains("a54")) return "/images/samsunga.jpg";
+        if (n.Contains("s23")) return "/images/samsungphone.jpg";
+        if (n.Contains("redmi") || n.Contains("xiaomi")) return "/images/redminote.jpg";
+        if (n.Contains("oneplus")) return "/images/oneplus.jpg";
+
+        if (n.Contains("laptop")) return "/images/laptop03.jpg";
+        if (n.Contains("mobile")) return "/images/samsungphone.jpg";
+
+        return "/images/no-image.jpg";
+    }
+}
+
+<h3 class="mb-3">Checkout</h3>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<div class="card p-3">
+    <div class="d-flex gap-3">
+        <img src="@ImgByProduct(Model.ProductName)"
+             style="width:140px; height:140px; object-fit:cover;"
+             class="rounded border"
+             alt="@Model.ProductName"
+             onerror="this.src='/images/no-image.jpg'" />
+
+        <div class="flex-grow-1">
+            <div class="fw-bold fs-5">@Model.ProductName</div>
+            <div class="text-muted">@Model.ProductDescription</div>
+            <div class="mt-2 fw-bold">₹ @Model.ProductPrice</div>
+            <div class="small text-muted">Available Stock: <b>@stock</b></div>
+        </div>
+    </div>
+
+    <hr />
+
+    @if (stock <= 0)
+    {
+        <div class="alert alert-warning mb-0">
+            Out of stock
+        </div>
+
+        <div class="mt-3">
+            <a class="btn btn-outline-dark" href="@Url.Action("Index", "Shop")">Back to Shop</a>
+        </div>
+    }
+    else
+    {
+        <form method="post" action="@Url.Action("Payment","Shop")" class="d-flex gap-2 align-items-end">
+            <input type="hidden" name="productId" value="@Model.ProductId" />
+
+            <div>
+                <label class="form-label">Qty</label>
+                <input class="form-control"
+                       type="number"
+                       name="qty"
+                       value="1"
+                       min="1"
+                       max="@stock"
+                       style="width:120px;" />
+            </div>
+
+            <button type="submit" class="btn btn-dark">
+                Proceed to Payment
+            </button>
+
+            <a class="btn btn-outline-dark" href="@Url.Action("Index", "Shop")">
+                Continue Shopping
+            </a>
+        </form>
+    }
+</div>

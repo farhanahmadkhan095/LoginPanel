@@ -1,0 +1,30 @@
+﻿@model IEnumerable<LoginPanel.Models.InventoryHistoryVM>
+@{
+    ViewBag.Title = "Inventory History";
+}
+
+<h4>📦 Inventory History</h4>
+
+<select id="ProductId" class="form-select mb-3">
+    <option value="">-- Select Product --</option>
+    @foreach (var p in ViewBag.Products)
+    {
+        <option value="@p.Value">@p.Text</option>
+    }
+</select>
+
+<div id="historyContainer"></div>
+
+@section Scripts {
+    <script>
+        $("#ProductId").change(function(){
+            var pid = $(this).val();
+            debugger
+           $.get('/Inventory/GetInventoryHistory', {productId:pid}).done(function (result) {
+            $('#historyContainer').html(result);
+                }).fail(function (xhr) {
+                    alert('An error occurred while category load.');
+                })
+        });
+    </script>
+}

@@ -1,0 +1,30 @@
+﻿@model ReceivePurchaseViewModel
+
+<div class="modal-header">
+    <h5 class="modal-title">PO #@Model.PurchaseOrderId - Received Items</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<div class="modal-body">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Ordered Qty</th>
+                <th>Received Qty</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>@item.ProductName</td>
+                    <td>@item.OrderedQty</td>
+                    <td>@item.ReceivedQty</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+</div>

@@ -1,0 +1,247 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f6f9;
+        }
+
+        /* ===== SIDEBAR ===== */
+
+        #sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, #111827, #0f172a);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 4px 0 25px rgba(0,0,0,0.4);
+        }
+
+        #sidebar.hide {
+            left: -260px;
+        }
+
+        #sidebar a {
+            color: #ffffff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            border-left: 4px solid transparent;
+        }
+
+        #sidebar a:hover {
+            background: rgba(59,130,246,0.15);
+            border-left: 4px solid #3b82f6;
+            padding-left: 16px;
+        }
+
+        #sidebar .collapse a {
+            padding-left: 45px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .sidebar-header {
+            text-align: center;
+            padding: 25px 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-header h5 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .sidebar-header small {
+            color: #9ca3af;
+        }
+
+        .sidebar-section {
+            padding: 15px 20px 6px;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 1px;
+            color: #9ca3af;
+            margin-top: 15px;
+        }
+
+        .sidebar-footer {
+            text-align: center;
+            padding: 15px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        /* ===== CONTENT ===== */
+
+        #content {
+            margin-left: 260px;
+            padding: 25px;
+            transition: margin-left 0.3s;
+        }
+
+        #content.full-width {
+            margin-left: 0;
+        }
+
+        /* ===== NAVBAR ===== */
+
+        .navbar {
+            background: #0f172a !important;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .arrow {
+            margin-left: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-dark px-3">
+        <button class="btn btn-outline-light" onclick="toggleSidebar()">☰</button>
+        <span class="navbar-brand ms-2">@ViewData["Title"]</span>
+    </nav>
+
+    <!-- Sidebar -->
+    <div id="sidebar">
+
+        <div class="sidebar-header">
+            <h5>Roundpay Mart</h5>
+            <small>Admin Panel</small>
+        </div>
+
+        <!-- Home -->
+        <a href="javascript:void(0)" onclick="toggleMenu('homeMenu')">
+            <i class="bi bi-house-door"></i> Home
+            <span class="arrow" id="homeMenuArrow">▾</span>
+        </a>
+
+        <div id="homeMenu" class="collapse">
+            <a asp-controller="LoginPanel" asp-action="Login">
+                <i class="bi bi-box-arrow-in-right"></i> Login
+            </a>
+            <a asp-controller="LoginPanel" asp-action="Registration">
+                <i class="bi bi-person-plus"></i> Registration
+            </a>
+            <a asp-controller="LoginPanel" asp-action="Logout">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+        </div>
+
+        <!-- Master -->
+        <div class="sidebar-section">Master</div>
+
+        <a asp-controller="LoginPanel" asp-action="Vendor">
+            <i class="bi bi-people"></i> Vendor
+        </a>
+
+        <a asp-controller="Inventory" asp-action="Index">
+            <i class="bi bi-box-seam"></i> Inventory
+        </a>
+
+        <a asp-controller="Inventory" asp-action="Adjustment">
+            <i class="bi bi-sliders"></i> Inventory Adjustment
+        </a>
+
+        <a asp-controller="Inventory" asp-action="Correction">
+            <i class="bi bi-tools"></i> Inventory Correction
+        </a>
+
+        <a asp-controller="Inventory" asp-action="History">
+            <i class="bi bi-clock-history"></i> Inventory History
+        </a>
+
+        <a asp-controller="InventoryAdjustmentReason" asp-action="Index">
+            <i class="bi bi-gear"></i> Adjustment Reason
+        </a>
+
+        <!-- Reports -->
+        <div class="sidebar-section">Reports</div>
+
+        <a asp-controller="LoginPanel" asp-action="VendorReport">
+            <i class="bi bi-bar-chart"></i> Vendor Report
+        </a>
+
+        <!-- Pricing -->
+        <div class="sidebar-section">Pricing</div>
+
+        <a asp-controller="VendorProductPricing" asp-action="Index">
+            <i class="bi bi-currency-rupee"></i> Vendor Product Pricing
+        </a>
+
+        <!-- Purchase -->
+        <div class="sidebar-section">Purchase</div>
+
+        <a asp-controller="PurchaseOrder" asp-action="Create">
+            <i class="bi bi-cart-plus"></i> Create Purchase Order
+        </a>
+
+        <a asp-controller="ReceivedPurchase" asp-action="Index">
+            <i class="bi bi-truck"></i> Receive Purchase Order
+        </a>
+
+        <div class="sidebar-footer">
+            &copy; 2026 Roundpay Mart
+        </div>
+
+    </div>
+
+    <!-- Main Content -->
+    <div id="content">
+        @RenderBody()
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("hide");
+            const content = document.getElementById("content");
+            content.classList.toggle("full-width");
+        }
+
+        function toggleMenu(menuId) {
+            const menu = $('#' + menuId);
+            const arrow = document.getElementById(menuId + "Arrow");
+
+            menu.collapse('toggle');
+
+            menu.on('shown.bs.collapse', function () {
+                arrow.innerHTML = '▴';
+            });
+
+            menu.on('hidden.bs.collapse', function () {
+                arrow.innerHTML = '▾';
+            });
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>

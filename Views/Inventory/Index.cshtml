@@ -1,0 +1,125 @@
+﻿@model IEnumerable<InventoryDto>
+
+@{
+    ViewData["Title"] = "Inventory";
+}
+
+<div class="container mt-5">
+
+   
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">📦 Inventory Stock</h3>
+            <span class="text-white-50">Total Items: @(Model?.Count() ?? 0)</span>
+        </div>
+
+        <div class="card-body">
+
+            
+            <div class="row g-3 mb-4 align-items-end">
+                <div class="col-md-4">
+                    <label for="productFilter" class="form-label fw-semibold">Filter by Product:</label>
+                    <select id="productFilter" class="form-select">
+                        <option value="">-- All Products --</option>
+                        @foreach (var item in Model.Select(m => m.ProductName).Distinct())
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="searchBox" class="form-label fw-semibold">Search Product:</label>
+                    <input type="text" id="searchBox" class="form-control" placeholder="Type product name...">
+                </div>
+                <div class="col-md-4 d-flex gap-2">
+                    <button id="filterBtn" class="btn btn-success flex-fill">Filter</button>
+                    <button id="resetBtn" class="btn btn-secondary flex-fill">Reset</button>
+                </div>
+            </div>
+
+            
+            <div class="table-responsive">
+                <table id="inventoryTable" class="table table-hover table-striped table-bordered align-middle mb-0">
+                    <thead class="table-dark text-center">
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Last Change</th>
+                            <th>Unit Cost (₹)</th>
+                            <th>Total Cost (₹)</th>
+                            <th>Reason</th>
+                            <th>Is Current</th>
+                             <th>Entry Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@item.ProductName</td>
+                                    <td class="text-center fw-bold">@item.Quantity</td>
+                                    <td class="text-center"> @(item.QuantityChange >= 0 ? "+" + item.QuantityChange : item.QuantityChange.ToString())  </td>
+                                    <td class="text-end">₹ @item.UnitCost.ToString("N2")</td>
+                                    <td class="text-end fw-semibold">₹ @item.TotalCost.ToString("N2")</td>
+                                    <td class="text-center">@item.ReasonName</td>
+                                    <td class="text-center">
+                                        <span class="badge @(item.IsCurrent ? "bg-success" : "bg-secondary")">
+                                            @(item.IsCurrent ? 1 : 0)
+                                        </span>
+                                    </td>
+                                    <td class="text-center">@item.EntryDate.ToString("dd-MM-yyyy")</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">
+                                    No inventory data found
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div> 
+    </div> 
+
+</div> 
+@section Scripts {
+    <script>
+        const filterBtn = document.getElementById('filterBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const productFilter = document.getElementById('productFilter');
+        const searchBox = document.getElementById('searchBox');
+
+        function applyFilter() {
+            const filterValue = productFilter.value.toLowerCase().trim();
+            const searchValue = searchBox.value.toLowerCase().trim();
+
+            const tableRows = document.querySelectorAll('#inventoryTable tbody tr');
+
+            tableRows.forEach(tr => {
+                const productName = tr.cells[0].innerText.toLowerCase().trim();
+
+                const matchesFilter = !filterValue || productName === filterValue;
+                const matchesSearch = !searchValue || productName.includes(searchValue);
+
+                tr.style.display = (matchesFilter && matchesSearch) ? '' : 'none';
+            });
+        }
+
+        filterBtn.addEventListener('click', applyFilter);
+        searchBox.addEventListener('keyup', applyFilter);
+
+        resetBtn.addEventListener('click', function () {
+            productFilter.value = '';
+            searchBox.value = '';
+            document.querySelectorAll('#inventoryTable tbody tr')
+                .forEach(tr => tr.style.display = '');
+        });
+    </script>
+}

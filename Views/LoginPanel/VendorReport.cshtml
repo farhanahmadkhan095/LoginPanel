@@ -1,0 +1,171 @@
+﻿@{
+    ViewData["Title"] = "";
+}
+<h2 class="text-center mb-4">Vendor List</h2>
+
+
+<div class="card shadow-sm p-4 mb-4">
+    <div class="row g-3">
+
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Vendor Name</label>
+            <input type="text" id="txtVendorName" class="form-control" placeholder="Search by name">
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Email</label>
+            <input type="text" id="txtEmail" class="form-control" placeholder="Search by email">
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Contact Number</label>
+            <input type="text" id="txtContact" class="form-control" placeholder="Search by contact">
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Status</label>
+            <select id="ddlStatus" class="form-select">
+                <option value="">All</option>
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+            </select>
+        </div>
+
+    </div>
+
+    <div class="mt-4 text-start">
+        <button class="btn btn-primary px-4" onclick="LoadVendorReport()">Search</button>
+    </div>
+
+</div>
+<div class="text-end mb-3">
+    <button id="btnExcel" class="btn btn-success">Download Excel</button>
+    <button id="btnPDF" class="btn btn-danger">Download PDF</button>
+</div>
+
+
+<div class="table-responsive shadow-sm">
+    <table class="table table-hover align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Sr No</th>
+                <th>Name</th> 
+                <th>Contact</th>
+                <th>Email</th>
+                <th>Address</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Modified</th>
+                <th>Deleted</th>
+            </tr>
+        </thead>
+        <tbody id="reportBody"></tbody>
+    </table>
+</div>
+
+
+
+@section Scripts {
+    <script>
+        function LoadVendorReport() { 
+            $.ajax({
+                url: "/LoginPanel/GetVendorReport",
+                type: "GET",
+                data: {
+                    name: $("#txtVendorName").val().trim(),
+                    email: $("#txtEmail").val().trim(),
+                    contact: $("#txtContact").val().trim(),
+                    status: $("#ddlStatus").val()
+                },
+                success: function (html) {
+                    $("#reportBody").html(html);
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            LoadVendorReport();
+        });
+
+        // EXCEL
+        $("#btnExcel").click(function () {
+            let url = "/LoginPanel/DownloadVendorExcel?" +
+                "name=" + $("#txtVendorName").val().trim() +
+                "&email=" + $("#txtEmail").val().trim() +
+                "&contact=" + $("#txtContact").val().trim() +
+                "&status=" + $("#ddlStatus").val();
+
+            window.location.href = url;
+        });
+
+        // PDF
+               $("#btnPDF").click(function () {
+            let url = "/LoginPanel/DownloadVendorPdf?" +
+                "name=" + $("#txtVendorName").val().trim() +
+                "&email=" + $("#txtEmail").val().trim() +
+                "&contact=" + $("#txtContact").val().trim() +
+                "&status=" + $("#ddlStatus").val();
+
+            window.location.href = url;
+        });
+
+    </script>
+    @* Same Toggle CSS *@
+    <style>
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 22px;
+        }
+
+            .switch input {
+                display: none;
+            }
+
+        .slider {
+            position: absolute;
+            cursor: not-allowed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 30px;
+        }
+
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 16px;
+                width: 16px;
+                left: 3px;
+                bottom: 3px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+            }
+
+        input:checked + .slider {
+            background-color: #28a745;
+        }
+
+            input:checked + .slider:before {
+                transform: translateX(24px);
+            }
+
+        /* Delete Toggle Red */
+        .delete-slider {
+            background-color: #ccc;
+        }
+
+        input:checked + .delete-slider {
+            background-color: #dc3545;
+        }
+
+            input:checked + .delete-slider:before {
+                transform: translateX(24px);
+            }
+    </style>
+}

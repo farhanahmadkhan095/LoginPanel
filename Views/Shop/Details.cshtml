@@ -1,0 +1,126 @@
+﻿@model LoginPanel.Models.ProductModel
+@{
+    ViewBag.Title = "Product Details";
+    Layout = "~/Views/Shared/ShopLayout.cshtml";
+}
+
+@functions {
+    string ImgByProduct(string name)
+    {
+        var n = (name ?? "").Trim().ToLower();
+
+        if (n.Contains("pixel 8") || (n.Contains("google") && n.Contains("pixel"))) //ok
+            return "/images/GooglePixel8.png";
+
+        // ✅ FIX: lowercase
+        if (n.Contains("apple macbook air") || (n.Contains("apple") && n.Contains("macbook") && n.Contains("air"))) //ok
+            return "/images/AppleMacBook.png";
+
+        if (n.Contains("iphone 15") || (n.Contains("iphone") && n.Contains("15"))) //ok
+            return "/images/iphone15.jpg";
+
+        if (n.Contains("acer aspire 7") || (n.Contains("acer") && n.Contains("aspire")))
+            return "/images/Acer.png";
+
+        if (n.Contains("thinkpad") || n.Contains("lenovo"))  //ok
+            return "/images/LenovoThinkPad.png";
+
+        // ✅ FIX: lowercase
+        if (n.Contains("hp pavilion 15") || (n.Contains("hp") && n.Contains("pavilion")))  //ok
+            return "/images/HPPAVILION1.png";
+
+        if (n.Contains("dell xps") || (n.Contains("dell") && n.Contains("xps")))  //ok
+            return "/images/delllaptop04.png";
+
+        if (n.Contains("samsung a54") || n.Contains("a54"))  //ok
+            return "/images/samsunga.jpg";
+
+        if (n.Contains("samsung galaxy s24") || (n.Contains("samsung") && n.Contains("s24")) || n.Contains("s24"))  //ok
+            return "/images/samsung24.png";
+
+        if (n.Contains("redmi note") || n.Contains("xiaomi") || n.Contains("redmi"))  //ok
+            return "/images/redminote.jpg";
+
+        if (n.Contains("oneplus"))  //ok
+            return "/images/oneplus.jpg";
+
+        if (n.Contains("realme gt neo 3") || (n.Contains("realme") && n.Contains("neo") && n.Contains("3")) || n.Contains("gt neo 3"))
+            return "/images/Realme1.png";
+
+        return "/images/no-image.jpg";
+    }
+}
+
+<div class="row g-4">
+    <div class="col-md-5">
+        <div class="border rounded bg-white p-2">
+            <img src="@ImgByProduct(Model.ProductName)"
+                 class="img-fluid"
+                 style="width:100%; height:360px; object-fit:contain;"
+                 alt="@Model.ProductName"
+                 onerror="this.src='/images/no-image.jpg'">
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <h3 class="fw-bold mb-2">@Model.ProductName</h3>
+
+        <!-- Rating UI -->
+        <div class="small text-warning mb-2">
+            ★★★★☆ <span class="text-muted">4.0 out of 5</span>
+            <span class="text-muted"> | 1,467 ratings</span>
+        </div>
+
+        <!-- Price -->
+        <div class="fs-3 fw-bold mb-2">₹ @Model.ProductPrice</div>
+
+        <!-- Stock -->
+        <div class="small text-muted mb-3">
+            Available: <b>@Model.AvailableQty</b>
+            @if (Model.AvailableQty <= 0)
+            {
+                <span class="badge text-bg-secondary ms-2">Out of Stock</span>
+            }
+        </div>
+
+        <!-- Description -->
+        <div class="text-muted mb-3">
+            @Model.ProductDescription
+        </div>
+
+        <!-- Features (UI only) -->
+        <h6 class="fw-bold mb-2">Features</h6>
+        <ul class="small mb-4">
+            <li>Lightweight & comfortable</li>
+            <li>Durable build quality</li>
+            <li>Easy to use / carry</li>
+            <li>Warranty (sample)</li>
+        </ul>
+
+        <!-- Actions -->
+        <div class="d-grid gap-2" style="max-width:360px;">
+            @if (Model.AvailableQty <= 0)
+            {
+                <button class="btn btn-secondary" disabled>Out of Stock</button>
+            }
+            else
+            {
+                <a class="btn btn-dark"
+                   href="@Url.Action("BuyNow", "Shop", new { id = Model.ProductId })">
+                    Buy Now
+                </a>
+
+                <!-- Note: AddToCart action/controller banana padega, tabhi use karna -->
+                <a class="btn btn-outline-dark"
+                   href="@Url.Action("AddToCart", "Shop", new { id = Model.ProductId })">
+                    Add to Cart
+                </a>
+            }
+
+            <a class="btn btn-outline-secondary"
+               href="@Url.Action("Index", "Shop")">
+                Back
+            </a>
+        </div>
+    </div>
+</div>

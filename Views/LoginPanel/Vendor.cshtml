@@ -1,0 +1,343 @@
+﻿@using Microsoft.AspNetCore.Http
+<style>
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
+
+        .switch input {
+            display: none;
+        }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        background-color: #ccc;
+        border-radius: 34px;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        transition: .4s;
+    }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            border-radius: 50%;
+            transition: .4s;
+        }
+
+    input:checked + .slider {
+        background-color: #4CAF50;
+    }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+    .editable {
+        border: none;
+        background: transparent;
+        outline: none;
+        display: inline-block;
+        width: auto;
+        min-width: 1px;
+        padding: 0;
+        font-size: 14px;
+        box-sizing: content-box !important;
+        text-decoration: underline;
+    }
+
+        .editable:focus {
+            text-decoration: none;
+        }
+
+    #productTable td {
+        padding: 4px 6px !important;
+    }
+
+        #productTable td input.editable {
+            width: auto !important;
+        }
+
+    #productModal input,
+    #productModal textarea,
+    #productModal select {
+        border: 1px solid #ced4da !important;
+        background: white !important;
+        padding: 6px !important;
+    }
+
+    .top-action-row {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        margin-top: 15px;
+    }
+
+    .right-buttons {
+        display: flex;
+        gap: 10px;
+    }
+</style>
+
+
+<div class="top-action-row">
+    <button class="btn btn-primary" onclick="addOrEditView(0)"> + Add New Vendor</button>
+    <div class="right-buttons d-flex" style="gap:10px;">
+    </div>
+</div>
+
+<table id="VendorTable" class="table table-bordered text-center">
+    <thead>
+        <tr>
+            <th>Sr.No</th>
+            <th>Vendor Name</th>
+            <th>Contact Number</th>
+            <th>Email</th>
+            <th>Address</th>
+            <th>IsActive</th>
+            <th>CreatedDate</th>
+            <th>ModifiedDate</th>
+            <th>Edit</th>
+            <th>Delete</th>
+
+        </tr>
+    </thead>
+    <tbody id="Vendorbody"></tbody>
+</table>
+
+
+<div class="modal fade" id="VendorModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Vendor Form</h5>
+                <button class="close" data-dismiss="modal" id="closemodal">&times;</button>
+            </div>
+
+            <div class="modal-body" id="addOrEditView">
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        getVendorList();
+
+        $("#closemodal").click(() => {
+            $("#VendorModal").modal("hide");
+        });
+    });
+
+    function addOrEditView(_vendorId){
+
+        var obj = {
+            VendorId : _vendorId
+        }
+
+        $.ajax({
+            url: "/LoginPanel/AddOrEditVendor",
+            type: "GET",
+            data : obj,
+            success: function (response) {
+                var $modalPoup =  $("#VendorModal");
+               $modalPoup.find("#addOrEditView").html(response);
+              $modalPoup.modal("show");
+
+            },
+            error: function () {
+                console.error("Error loading vendor list");
+            }
+        });
+    }
+
+    function OpenCreateVendorForm() {
+        $("#VendorId").val(0);
+        $("#VendorName").val("");
+        $("#VendorContactNumber").val("");
+        $("#VendorEmail").val("");
+        $("#VendorAddress").val("");
+        $("#IsActive").prop("checked", true);
+        $("#VendorModal").modal("show");
+    }
+
+
+    function getVendorList() {
+        $.ajax({
+            url: "/LoginPanel/VendorPRTView",
+            type: "GET",
+            success: function (response) {
+
+                $("#Vendorbody").empty().html(response);
+            },
+            error: function () {
+                console.error("Error loading vendor list");
+            }
+        });
+    }
+    function SaveVendor() {
+
+        let obj = {
+            VendorId: $("#VendorId").val(),
+            VendorName: $("#VendorName").val(),
+            ContactNumber: $("#VendorContactNumber").val(),
+            Email: $("#VendorEmail").val(),
+            Address: $("#VendorAddress").val(),
+            IsActive: $("#IsActive").prop("checked")
+        };
+
+        $.ajax({
+            url: "/LoginPanel/AddVendor",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(obj),
+            success: function () {
+                Swal.fire("Saved!", "Vendor Saved Successfully!", "success");
+                $("#VendorModal").modal("hide");
+                getVendorList();
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                Swal.fire("Error", "Error while saving!", "error");
+            }
+        });
+    }
+
+        function EditVendor(id) {
+               var obj = {
+                    VendorId : _vendorId
+                }
+            $.ajax({
+                url: "/LoginPanel/AddOrEditVendor?VendorId=" + id,
+                type: "GET",
+                data : obj,
+                success: function (response) {
+                    var $modalPoup =  $("#VendorModal");
+                   $modalPoup.find("#addOrEditView").html(response);
+                  $modalPoup.modal("show");
+
+                },
+                error: function () {
+                    console.error("Error loading vendor list");
+                }
+            });
+          }
+
+    function DeleteVendor(id) {
+        if (!confirm("Delete Vendor?")) return;
+
+        $.ajax({
+            url: "/LoginPanel/DeleteVendor?id=" + id,
+            type: "POST",
+            success: function (res) {
+                alert(res.message);
+                getVendorList();
+            }
+        });
+    }
+
+    function updateVendorStatus(_this, id) {
+        var isActive = $(_this).is(":checked");
+
+        $.ajax({
+            url: "/LoginPanel/ToggleVendorStatus",
+            type: "POST",
+            data: { id: id, isActive: isActive },
+            success: function (res) {
+                alert(res.message);
+            }
+        });
+    }
+
+        function UpdateStatus(id, isActive) {
+        $.ajax({
+            url: "/LoginPanel/ToggleVendorStatus",
+            type: "POST",
+            data: {
+                id: id,
+                isActive: isActive
+            },
+            success: function (response) {
+
+                if (response.status === 1) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Success",
+                        text: "Status Updated!"
+                    });
+
+                    // Vendor list ko reload karo
+                    VendorList();
+                }
+                else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: "Failed to update!"
+                    });
+                }
+            },
+            error: function () {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Something went wrong!"
+                });
+            }
+        });
+    }
+
+    $(document).on("change", ".toggle-delete", function () {
+
+        let id = $(this).data("id");
+        let isDelete = $(this).is(":checked");
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: isDelete ? "Vendor will be soft deleted!" : "Vendor will be restored!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, continue"
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+
+                $.ajax({
+                    url: "/LoginPanel/ToggleVendorDelete",
+                    type: "POST",
+                    data: { id: id, isDelete: isDelete },
+                    success: function (res) {
+
+                        Swal.fire({
+                            icon: "success",
+                            title: "Success",
+                            text: res.message
+                        });
+
+                        VendorList(); // list refresh
+                    }
+                });
+
+            } else {
+                $(this).prop("checked", !isDelete);
+            }
+
+        });
+
+    });
+
+</script>

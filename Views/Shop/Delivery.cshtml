@@ -1,0 +1,45 @@
+﻿@{
+    ViewBag.Title = "Delivery";
+    Layout = "~/Views/Shared/ShopLayout.cshtml";
+}
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="p-4 bg-white border rounded-4 shadow-sm">
+            <h3 class="fw-bold mb-2">Delivery & Returns</h3>
+            <p class="text-muted mb-4">Shipping timelines, return policy and order tracking guidelines.</p>
+
+            <div class="border rounded-4 p-3 mb-3">
+                <div class="fw-semibold"><i class="bi bi-truck me-2"></i> Standard Delivery</div>
+                <div class="text-muted small">Estimated 2–5 business days after dispatch.</div>
+            </div>
+
+            <div class="border rounded-4 p-3 mb-3">
+                <div class="fw-semibold"><i class="bi bi-lightning-charge me-2"></i> Express Delivery</div>
+                <div class="text-muted small">Next-day delivery in selected locations.</div>
+            </div>
+
+            <div class="border rounded-4 p-3">
+                <div class="fw-semibold"><i class="bi bi-arrow-repeat me-2"></i> Returns</div>
+                <div class="text-muted small">7-day return window for eligible items (demo policy).</div>
+            </div>
+
+            <hr class="my-4" />
+            <a class="btn btn-outline-dark" href="@Url.Action("Support", "Shop")">
+                <i class="bi bi-headset me-1"></i> Need Help?
+            </a>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="p-4 bg-white border rounded-4 shadow-sm">
+            <div class="fw-bold mb-2">Order Tracking</div>
+            <div class="text-muted small mb-3">
+                Track your order status from <b>My Orders</b> page after login.
+            </div>
+            <a class="btn btn-dark w-100" href="@Url.Action("Orders", "Shop")">
+                <i class="bi bi-receipt me-1"></i> My Orders
+            </a>
+        </div>
+    </div>
+</div>

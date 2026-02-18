@@ -1,0 +1,71 @@
+﻿@{
+    ViewBag.Title = "New Arrivals";
+    Layout = "~/Views/Shared/ShopLayout.cshtml";
+}
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="p-4 bg-white border rounded-4 shadow-sm">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div>
+                    <h3 class="fw-bold mb-1">New Arrivals</h3>
+                    <div class="text-muted">Recently added products and trending picks.</div>
+                </div>
+                <a class="btn btn-dark" href="@Url.Action("Index", "Shop")">
+                    <i class="bi bi-grid me-1"></i> Browse Products
+                </a>
+            </div>
+
+            <hr class="my-4" />
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="border rounded-4 p-3 h-100">
+                        <div class="fw-semibold"><i class="bi bi-lightning-charge me-2"></i> Trending Now</div>
+                        <div class="text-muted small">Popular items with fast moving stock.</div>
+                        <div class="small mt-2">
+                            <span class="badge text-bg-success">New</span>
+                            <span class="badge text-bg-light text-dark border">Updated</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="border rounded-4 p-3 h-100">
+                        <div class="fw-semibold"><i class="bi bi-stars me-2"></i> Staff Picks</div>
+                        <div class="text-muted small">Handpicked products with best value.</div>
+                        <div class="small mt-2">
+                            <span class="badge text-bg-primary">Top Choice</span>
+                            <span class="badge text-bg-light text-dark border">Best Value</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="border rounded-4 p-3">
+                        <div class="fw-semibold"><i class="bi bi-info-circle me-2"></i> Note</div>
+                        <div class="text-muted small">
+                            This page is a UI section for your training project. You can later connect it to DB using CreatedDate/Latest entries.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4" />
+            <a class="btn btn-outline-dark" href="@Url.Action("Index", "Shop")">
+                <i class="bi bi-arrow-left me-1"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="p-4 bg-white border rounded-4 shadow-sm">
+            <div class="fw-bold mb-2">Quick Filters</div>
+            <div class="d-grid gap-2">
+                <a class="btn btn-outline-dark" href="@Url.Action("Index", "Shop")"><i class="bi bi-phone me-1"></i> Mobiles</a>
+                <a class="btn btn-outline-dark" href="@Url.Action("Index", "Shop")"><i class="bi bi-laptop me-1"></i> Laptops</a>
+                <a class="btn btn-outline-dark" href="@Url.Action("Index", "Shop")"><i class="bi bi-headphones me-1"></i> Accessories</a>
+            </div>
+        </div>
+    </div>
+</div>

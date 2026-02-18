@@ -1,0 +1,35 @@
+﻿@model List<LoginPanel.Models.VendorModel>
+
+@{
+    int i = 1;
+}
+
+@foreach (var item in Model)
+{
+    <tr>
+        <td>@i</td>
+        <td>@item.VendorName</td>
+        <td>@item.ContactNumber</td>
+        <td>@item.Email</td>
+        <td>@item.Address</td>
+
+        <td>
+            <label class="switch">
+                <input type="checkbox" @(item.IsActive ? "checked" : "") disabled />
+                <span class="slider"></span>
+            </label>
+        </td>
+
+        <td>@item.CreatedDate</td>
+        <td>@item.ModifiedDate</td>
+
+        <td>
+            <label class="switch">
+                <input type="checkbox" @(item.IsDeleted ? "checked" : "") disabled />
+                <span class="slider delete-slider"></span>
+            </label>
+        </td>
+    </tr>
+
+    i++;
+}

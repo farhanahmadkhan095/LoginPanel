@@ -1,0 +1,38 @@
+﻿@model IEnumerable<LoginPanel.Models.InventoryHistoryVM>
+
+<table class="table table-bordered table-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>Date</th>
+            <th>Old Qty</th>
+            <th>Change</th>
+            <th>New Qty</th>
+            <th>Reason</th>
+            <th>Type</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.ActionDate.ToString("dd-MM-yyyy HH:mm")</td>
+                    <td>@item.OldQty</td>
+                    <td>@item.QtyChange</td>
+                    <td><b>@item.NewQty</b></td>
+                    <td>@item.Reason</td>
+                    <td>@item.ActionType</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="6" class="text-center text-muted">
+                    No history found
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

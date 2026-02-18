@@ -1,0 +1,77 @@
+﻿@model LoginPanel.Models.CheckoutAddressVM
+@{
+    ViewBag.Title = "Delivery Address";
+    Layout = "~/Views/Shared/ShopLayout.cshtml";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card shadow-sm rounded-4">
+            <div class="card-body p-4">
+                <h4 class="mb-1">Delivery Address</h4>
+                <div class="text-muted mb-3">Address required to complete order</div>
+
+                <form asp-action="CheckoutAddress" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="row g-3">
+
+                        <!-- Full Name -->
+                        <div class="col-md-6">
+                            <label class="form-label">Full Name *</label>
+                            <input asp-for="FullName" class="form-control" />
+                            <span asp-validation-for="FullName" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Mobile -->
+                        <div class="col-md-6">
+                            <label class="form-label">Mobile *</label>
+                            <input asp-for="Mobile" class="form-control" />
+                            <span asp-validation-for="Mobile" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Address -->
+                        <div class="col-12">
+                            <label class="form-label">Address *</label>
+                            <input asp-for="AddressLine" class="form-control" />
+                            <span asp-validation-for="AddressLine" class="text-danger small"></span>
+                        </div>
+
+                        <!-- City -->
+                        <div class="col-md-6">
+                            <label class="form-label">City *</label>
+                            <input asp-for="City" class="form-control" />
+                            <span asp-validation-for="City" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Pincode -->
+                        <div class="col-md-6">
+                            <label class="form-label">Pincode *</label>
+                            <input asp-for="Pincode" class="form-control" maxlength="6" />
+                            <span asp-validation-for="Pincode" class="text-danger small"></span>
+                        </div>
+
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <a class="btn btn-outline-secondary" href="@Url.Action("Cart", "Shop")">
+                            Back
+                        </a>
+                        <button class="btn btn-dark ms-auto" type="submit">
+                            Save & Continue
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="small text-muted mt-2">
+            <i class="bi bi-shield-check me-1"></i>
+            We use this address only for delivery .
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,30 @@
+﻿@model List<LoginPanel.Models.VendorProductPriceDisplay>
+
+<div class="table-responsive" style="max-height:450px; overflow-y:auto;">
+    <table class="table table-bordered table-hover table-striped align-middle text-center">
+        <thead class="table-dark">
+            <tr class="text-uppercase">
+                <th style="width: 25%;">Vendor</th>
+                <th style="width: 35%;">Product</th>
+                <th style="width: 20%;">Vendor Price</th>
+                <th style="width: 20%;">History</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="fw-semibold fs-6">@item.VendorName</td>
+                    <td class="fs-6">@item.ProductName</td>
+                    <td class="fw-bold text-success fs-6">₹ @item.VendorPrice</td>
+                    <td>
+                        <button class="btn btn-outline-primary btn-sm btn-block"
+                                onclick="viewPriceHistory('@item.VendorId', '@item.ProductId')">
+                            View History
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,23 @@
+﻿@model IEnumerable<LoginPanel.Models.InventoryAdjustmentHistoryDto>
+
+<table class="table table-sm table-bordered">
+    <thead class="table-light">
+        <tr>
+            <th>Date</th>
+            <th>QtyChange</th>
+            <th>Reason</th>
+            <th>Stock After</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.AdjustmentDate.ToString("dd-MM-yyyy HH:mm")</td>
+                <td>@item.QtyChange</td>
+                <td>@item.ReasonName</td>
+                <td>@item.CurrentQtyAfter</td>
+            </tr>
+        }
+    </tbody>
+</table>

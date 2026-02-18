@@ -1,0 +1,38 @@
+﻿<form asp-action="Receive" method="post">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="PurchaseOrderId" value="@Model.PurchaseOrderId" />
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Ordered</th>
+                <th>Received</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Items.Count; i++)
+            {
+                <tr>
+                    <td>
+                        @Model.Items[i].ProductName
+                        <input type="hidden" name="Items[@i].ProductId" value="@Model.Items[i].ProductId" />
+                        <input type="hidden" name="Items[@i].OrderedQty" value="@Model.Items[i].OrderedQty" />
+                    </td>
+                    <td>@Model.Items[i].OrderedQty</td>
+                    <td>
+                        <input type="number"
+                               name="Items[@i].ReceivedQty"
+                               value="0"
+                               min="0"
+                               max="@Model.Items[i].OrderedQty"
+                               class="form-control" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-success">Save Receive</button>
+</form>

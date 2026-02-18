@@ -1,0 +1,39 @@
+﻿@model List<LoginPanel.Models.VendorModel>
+
+@foreach (var item in Model)
+{
+    <tr id="row_@item.VendorId" class="trMain">
+        <td>@item.VendorId</td>
+        <td>@item.VendorName</td>
+        <td>@item.ContactNumber</td>
+        <td>@item.Email</td>
+        <td>@item.Address</td>
+        <td>
+            <label class="switch">
+            <input type="checkbox" class="toggle-active" data-id="@item.VendorId"
+                       @(item.IsActive ? "checked" : "") onclick="updateVendorStatus(this,@item.VendorId)" />
+             <span class="slider"></span>
+            </label>
+        </td>
+        <td>@item.CreatedDate</td>
+        <td id="tdModified_@item.VendorId">@item.ModifiedDate</td>
+
+        <td>
+            <a href="javascript:void(0)" onclick="addOrEditView(@item.VendorId)" class="btn btn-sm btn-warning">Edit</a>
+            </td>
+          <td>
+            @{
+                string _checked = item.IsDeleted ? "checked" : "";
+                }
+              <label class="switch">
+                <input type="checkbox"
+                       class="toggle-delete"
+                       data-id="@item.VendorId" 
+                        onclick="updateVendorDelete(this, @item.VendorId)"
+                       @_checked />
+                <span class="slider"></span>
+            </label>
+
+        </td>
+    </tr>
+}

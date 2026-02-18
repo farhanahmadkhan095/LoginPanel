@@ -1,0 +1,130 @@
+﻿@model LoginPanel.Models.PaymentViewModel
+@{
+    ViewBag.Title = "Pay Order";
+    Layout = "~/Views/Shared/ShopLayout.cshtml";
+}
+
+<h2>Pay for Order #@Model.OrderId</h2>
+
+<p>
+    <strong>Amount:</strong> ₹ @Model.Amount
+</p>
+
+<hr />
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<form id="payForm" method="post">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="orderId" value="@Model.OrderId" />
+    <input type="hidden" name="amount" value="@Model.Amount" />
+
+    <!-- 🔥 FINAL SOURCE OF TRUTH -->
+    <input type="hidden" id="finalPaymentMode" name="paymentMode" value="COD" />
+
+    <input type="hidden" id="rp_payment_id" name="razorpay_payment_id" />
+
+    <h4>Select Payment Mode</h4>
+
+    <label>
+        <input type="radio" name="mode" value="COD" checked />
+        Cash on Delivery
+    </label>
+    <br />
+
+    <label>
+        <input type="radio" name="mode" value="ONLINE" />
+        Pay Online (Razorpay)
+    </label>
+
+    <br /><br />
+
+    <!-- 🔥 IMPORTANT: button, NOT submit -->
+    <button type="button" id="payBtn" class="btn btn-primary">
+        Place Order
+    </button>
+</form>
+
+<script>
+    document.getElementById("payBtn").addEventListener("click", function () {
+
+        var mode = document.querySelector("input[name='mode']:checked").value;
+        var form = document.getElementById("payForm");
+        var orderId = "@Model.OrderId";
+
+        // ================= COD =================
+        if (mode === "COD") {
+            document.getElementById("finalPaymentMode").value = "COD";
+            form.action = "/Shop/PayConfirm";
+            form.submit();
+            return;
+        }
+
+        // ================= ONLINE =================
+        fetch("/Shop/CreateRazorpayOrder", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "RequestVerificationToken":
+                    document.querySelector("input[name='__RequestVerificationToken']").value
+            },
+            body: JSON.stringify(orderId)
+        })
+        .then(res => res.json())
+        .then(data => {
+
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+
+            // 🔴 Razorpay limit (₹50,000)
+            if (data.amount > 5000000) {
+                alert("Online payment available only up to ₹50,000. Please use COD.");
+                return;
+            }
+
+            var options = {
+                key: data.key,
+                amount: data.amount,
+                currency: "INR",
+                name: "My Shop",
+                description: "Order #" + orderId,
+                order_id: data.orderId,
+
+                handler: function (response) {
+
+                    document.getElementById("rp_payment_id").value =
+                        response.razorpay_payment_id;
+
+                    document.getElementById("finalPaymentMode").value = "ONLINE";
+
+                    form.action = "/Shop/RazorpayVerify";
+                    form.submit();
+                }
+            };
+
+            // ❌ USER CLOSED / FAILED
+            options.modal = {
+                ondismiss: function () {
+                    fetch("/Shop/PaymentFailed", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "RequestVerificationToken":
+                                document.querySelector("input[name='__RequestVerificationToken']").value
+                        },
+                        body: JSON.stringify(orderId)
+                    });
+                }
+            };
+
+            new Razorpay(options).open();
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Payment initiation failed!");
+        });
+    });
+</script>

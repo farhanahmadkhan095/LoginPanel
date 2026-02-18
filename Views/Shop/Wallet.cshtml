@@ -1,0 +1,19 @@
+﻿@using Microsoft.AspNetCore.Http
+
+@{
+    ViewBag.Title = "My Wallet";
+    Layout = "~/Views/Shared/ShopLayout.cshtml";
+}
+
+<div class="card shadow-sm p-4">
+    <h4 class="fw-bold mb-2">RoundPayMart Pay</h4>
+    <div class="text-muted">Wallet Balance</div>
+
+    <div class="fs-2 fw-bold text-success">
+        ₹ @Context.Session.GetInt32("WALLET")
+    </div>
+
+    <div class="text-muted small mt-2">
+        Wallet feature is demo.
+    </div>
+</div>

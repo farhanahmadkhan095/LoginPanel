@@ -1,0 +1,42 @@
+﻿@model List<LoginPanel.Models.ProductModel>
+@{
+    int i = 0;
+}
+@foreach (var item in Model)
+{
+    i++;
+    <tr class="trMain">
+        <td>@i</td>
+        <td>@item.ProductName</td>
+        
+        <td>
+            <input type="number"
+                   class="editable price-edit text-right"
+                   onchange="UpdateProductPrice(this, @item.ProductId)"
+                   value="@item.ProductPrice" />
+        </td>
+        <td>
+            <input type="text" class="editable desc-edit" onchange="UpdateDesc(this, @item.ProductId)" value="@item.ProductDescription" data-id="@item.ProductId" />
+        </td>
+        <td>
+            <label class="switch">
+                <input type="checkbox" class="toggle-active" onchange="updateStatus(this,@item.ProductId)"
+                       data-id="@item.ProductId" @(item.IsActive ? "checked" : "")>
+                <span class="slider"></span>
+            </label>
+        </td>
+        <td>@item.CreatedDate</td>
+        <td id="tdModifiedDate">
+            @item.ModifiedDate?.ToString("dd/MM/yyyy hh:mm tt")
+        </td>
+
+        <td>@item.EntryBy</td>
+        <td>
+            <div class="d-flex" style="gap:10px;">
+                <button class="btn btn-warning" onclick="EditProduct(@item.ProductId)">Edit</button>
+                <button class="btn btn-danger" onclick="DeleteProduct(@item.ProductId)">Delete</button>
+            </div>
+        </td>
+    </tr>
+}
+

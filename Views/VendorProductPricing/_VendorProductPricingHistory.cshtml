@@ -1,0 +1,40 @@
+﻿@model List<LoginPanel.Models.VendorProductPricingHistoryModel>
+
+<h3 class="text-center mb-4">VENDOR PRODUCT PRICING</h3>
+
+<div class="table-responsive"> @* style="max-height:400px; overflow-y:auto;"> *@
+    <table class="table table-bordered table-hover table-striped align-middle text-center">
+        <thead class="table-dark">
+            <tr>
+                <th style="width:20%;">Vendor</th>
+                <th style="width:25%;">Product</th>
+                <th style="width:15%;">Old Price</th>
+                <th style="width:15%;">New Price</th>
+                <th style="width:25%;">Changed On</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">@item.VendorName</td>
+                        <td>@item.ProductName</td>
+                        <td>₹ @item.OldPrice</td>
+                        <td class="fw-bold text-success">₹ @item.NewPrice</td>
+                        <td>@item.ChangedOn.ToString("dd-MMM-yyyy hh:mm tt")</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5" class="text-center text-muted fw-light">
+                        No history found
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
